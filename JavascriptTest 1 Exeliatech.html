@@ -1,0 +1,162 @@
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Search Movies</title>
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script><link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+    <style>
+        body {
+            /*background: url('http://www.wallpaperup.com/uploads/wallpapers/2013/02/09/38037/2cecdeaacf78fd0eee3c014c11cf6149-1000.jpg');*/
+            padding: 50px;
+        }
+
+        #divContainer {
+            background-color: white;
+            border-radius: 4px;
+        }
+
+        .centered {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            margin-top: -50px;
+            margin-left: -100px;
+            background-color: white;
+            border-radius: 4px;
+        }
+
+        h2 {
+            /*color: white;*/
+        }
+
+        .divSearch {
+            background-color: white;
+            border-radius: 4px;
+            height: 35px;
+        }
+
+        ul#menu li {
+            display: inline;
+            padding: 16px;
+            margin: 10px;
+        }
+
+        .modal-body {
+            padding: 50px;
+        }
+    </style>
+    <script>
+
+        function Search_Movie_By_Title() {
+            debugger;
+            var value = document.getElementById("txtSearch").value;
+            if (value) {
+                var searchUrl = "http://www.omdbapi.com/?apikey=dd352011&s=" + value;
+                CallService(searchUrl, 1);
+            }
+            else {
+                document.getElementById("txtSearch").value = "";
+            }
+        }
+        function CallService(url, requestType) {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("GET", url, true);
+            xhttp.send();
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    var response = JSON.parse(xhttp.responseText);
+                    if (requestType == 1) {
+                        DisplaySearchResult(response);
+                    }
+                    if (requestType == 2) {
+                        DisplayDetailResult(response)
+                        jQuery('#mymodal').trigger('click');
+                    }
+                }
+            };
+
+        }
+        function DisplaySearchResult(data) {
+            debugger;
+            var newHtml = "";
+            newHtml += "<ul id='menu'>";
+            $.each(data.Search, function (index, value) {
+                newHtml += "<li class='liMovie'>" + "<img src='" + value.Poster + "' onclick='MovieDetails(this)' alt='" + value.imdbID + "' width='200' height='200' />" + "</li>";
+            });
+            newHtml += "</ul>";
+            document.getElementById("divSearchResult").innerHTML = newHtml;
+        }
+        function DisplayDetailResult(data) {
+            debugger;
+            document.getElementById("divModelBody").innerHTML = "";
+            var newHtml = "";
+            newHtml += "<div class='row'>";
+            newHtml += "<a href='" + data.Website + "'><strong>Watch Online :</strong> " + data.Website + "</a>";
+            newHtml += "</div>";
+            newHtml += "<div class='row'><strong>Title</strong> :</strong>" + data.Title + "";
+            newHtml += "</div>";
+            newHtml += "<div class='row'><strong>Released :</strong>" + data.Released + "";
+            newHtml += "</div>";
+            newHtml += "<div class='row'><strong>Writer :</strong>" + data.Writer + "";
+            newHtml += "</div>";
+            newHtml += "<div class='row'><strong>Year :</strong>" + data.Year + "";
+            newHtml += "</div>";
+            newHtml += "<div class='row'><strong>imdbRating :</strong>" + data.imdbRating + "";
+            newHtml += "</div>";
+
+            document.getElementById("divModelBody").innerHTML = newHtml;
+        }
+
+        function MovieDetails(imdbID) {
+            url = "http://www.omdbapi.com/?apikey=dd352011&i=" + imdbID.alt;
+            CallService(url, 2);
+        }
+    </script>
+</head>
+
+<body>
+    <a href=""></a>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12"><center><h2>JavaScript Test - Movies Details</h2></center></div>
+        </div>
+        <br />
+        <div class="row" id="divSearch">
+            <div class="col-md-12">
+                <div class="col-md-3 divSearch"><h4>Search Movie By Title :</h4></div>
+                <div class="col-md-5"><input type="text" class="form-control" id="txtSearch" placeholder="Search..." /></div>
+                <div class="col-md-4"><button class="btn btn-default" onclick="javascript:Search_Movie_By_Title()" id="btnSearch">Search</button></div>
+            </div>
+        </div>
+        <div id="divSearchResult"></div>
+        <div id="divDetailResult"></div>
+        
+    </div>
+    <!-- Button trigger modal -->
+    <button type="button" id="mymodal" class="" data-toggle="modal" data-target="#myModal" hidden></button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Movie Details</h4>
+                </div>
+                <div class="modal-body">
+                    <div id="divModelBody"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
